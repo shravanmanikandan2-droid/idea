@@ -8,9 +8,10 @@ interface FooterProps {
   onContact?: () => void;
   onCareers?: () => void;
   onTerms?: () => void;
+  onAbout?: () => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ onPrivacyPolicy, onSuccessStories, onContact, onCareers, onTerms }) => {
+const Footer: React.FC<FooterProps> = ({ onPrivacyPolicy, onSuccessStories, onContact, onCareers, onTerms, onAbout }) => {
   return (
     <footer className="bg-white dark:bg-[#080D1D] text-gray-600 dark:text-gray-300 py-12 border-t border-gray-100 dark:border-transparent transition-colors duration-300">
       <div className="container mx-auto px-4">
@@ -55,7 +56,14 @@ const Footer: React.FC<FooterProps> = ({ onPrivacyPolicy, onSuccessStories, onCo
           <div className="text-center md:text-left">
             <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Company</h4>
             <ul className="space-y-2 text-gray-500 dark:text-gray-400 text-sm">
-              <li><a href="#" className="hover:text-indigo-600 dark:hover:text-white transition-colors duration-200">About</a></li>
+              <li>
+                <button 
+                  onClick={onAbout}
+                  className="hover:text-indigo-600 dark:hover:text-white transition-colors duration-200"
+                >
+                  About
+                </button>
+              </li>
               <li>
                 <button 
                   onClick={onCareers}

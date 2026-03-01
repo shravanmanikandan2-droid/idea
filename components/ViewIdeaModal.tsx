@@ -103,7 +103,7 @@ const ViewIdeaModal: React.FC<ViewIdeaModalProps> = ({ isOpen, idea, onClose, on
     try {
       const { data, error } = await supabase
         .from('idea_votes')
-        .select('yes_vote, no_vote')
+        .select('yes_vote, no_vote, maybe_vote')
         .eq('idea_id', idea.id);
 
       if (error) throw error;

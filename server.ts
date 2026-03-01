@@ -398,8 +398,8 @@ async function startServer() {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: "Email is required" });
 
-    // Generate a random 6-digit code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate a random 8-digit code
+    const code = Math.floor(10000000 + Math.random() * 90000000).toString();
     const expires = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
 
     verificationCodes.set(email.toLowerCase(), { code, expires });
@@ -416,7 +416,7 @@ async function startServer() {
         html: `
           <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
             <h2 style="color: #4f46e5; text-align: center;">IdeaConnect</h2>
-            <p>You requested a password reset. Please use the following 6-digit code to verify your identity:</p>
+            <p>You requested a password reset. Please use the following 8-digit code to verify your identity:</p>
             <div style="background: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 10px; border-radius: 10px; margin: 20px 0;">
               ${code}
             </div>

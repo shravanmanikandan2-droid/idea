@@ -16,16 +16,18 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [step, setStep] = useState<'request' | 'verify'>('request');
+  const [step, setStep] = useState<'request' | 'verify' | 'reset'>('request');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleRequestReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setResendSuccess(false);
 
     if (!isSupabaseConfigured()) {
       setError('Supabase is not configured.');
@@ -34,44 +36,57 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
     }
 
     try {
-      // Use direct fetch for better error visibility and control
-      const rawUrl = import.meta.env.VITE_SUPABASE_URL;
-      const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      
-      const response = await fetch(`${rawUrl}/functions/v1/request-reset`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${rawKey}`,
-          'apikey': rawKey
-        },
-        body: JSON.stringify({ email: email.trim() })
-      });
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim());
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.error === 'rate_limited') {
+      if (resetError) {
+        if (resetError.message.includes('rate_limit')) {
           throw new Error(t('Too many requests. Please wait an hour before trying again.'));
         }
-        throw new Error(data.error || data.details || t('Failed to send reset code'));
+        throw resetError;
       }
 
-      setStep('verify');
+      if (step === 'verify') {
+        setResendSuccess(true);
+        setTimeout(() => setResendSuccess(false), 5000);
+      } else {
+        setStep('verify');
+      }
     } catch (err: any) {
       console.error('Request Reset Error:', err);
-      // Handle the specific "Failed to fetch" error which usually means network/CORS/DNS issue
-      if (err.message === 'Failed to fetch') {
-        setError(t('Could not reach the reset service. Please check your internet connection or try again later.'));
-      } else {
-        setError(err.message || t('Failed to send reset code'));
-      }
+      setError(err.message || t('Failed to send reset code'));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleVerifyReset = async (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: otp.trim(),
+        type: 'recovery'
+      });
+
+      if (verifyError) {
+        if (verifyError.message.includes('invalid_otp')) throw new Error(t('Invalid verification code'));
+        if (verifyError.message.includes('expired')) throw new Error(t('Code has expired'));
+        throw verifyError;
+      }
+
+      setStep('reset');
+    } catch (err: any) {
+      console.error('Verify OTP Error:', err);
+      setError(err.message || t('Failed to verify code'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -89,29 +104,12 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
     }
 
     try {
-      const rawUrl = import.meta.env.VITE_SUPABASE_URL;
-      const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      const response = await fetch(`${rawUrl}/functions/v1/verify-reset`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${rawKey}`,
-          'apikey': rawKey
-        },
-        body: JSON.stringify({ 
-          email: email.trim(),
-          otp: otp.trim(),
-          new_password: password
-        })
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: password
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.error === 'invalid_otp') throw new Error(t('Invalid verification code'));
-        if (data.error === 'expired') throw new Error(t('Code has expired'));
-        throw new Error(data.error || data.details || t('Failed to update password'));
+      if (updateError) {
+        throw updateError;
       }
 
       setSuccess(true);
@@ -119,12 +117,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
         onBack();
       }, 3000);
     } catch (err: any) {
-      console.error('Verify Reset Error:', err);
-      if (err.message === 'Failed to fetch') {
-        setError(t('Could not reach the verification service. Please try again later.'));
-      } else {
-        setError(err.message || t('Failed to update password'));
-      }
+      console.error('Update Password Error:', err);
+      setError(err.message || t('Failed to update password'));
     } finally {
       setLoading(false);
     }
@@ -169,6 +163,17 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
             >
               <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
               {error}
+            </motion.div>
+          )}
+
+          {resendSuccess && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 rounded-2xl flex items-center text-green-600 dark:text-green-400 text-sm"
+            >
+              <CheckCircle2 className="w-5 h-5 mr-3 flex-shrink-0" />
+              {t('Reset code resent successfully')}
             </motion.div>
           )}
 
@@ -218,8 +223,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
                 )}
               </button>
             </form>
-          ) : (
-            <form onSubmit={handleVerifyReset} className="space-y-6">
+          ) : step === 'verify' ? (
+            <form onSubmit={handleVerifyOtp} className="space-y-6">
               <div>
                 <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">{t('Verification Code')}</label>
                 <div className="relative">
@@ -229,13 +234,39 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     className="w-full bg-gray-50 dark:bg-[#0A1025] border border-gray-100 dark:border-gray-800 rounded-2xl py-4 pl-12 pr-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                    placeholder="123456"
-                    maxLength={6}
+                    placeholder="12345678"
+                    maxLength={8}
                     required
                   />
                 </div>
               </div>
 
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center shadow-lg shadow-indigo-500/25 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    {t('Verify Code')}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
+              </button>
+              
+              <button 
+                type="button"
+                onClick={handleRequestReset}
+                disabled={loading}
+                className="w-full text-sm text-gray-500 hover:text-indigo-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t('Resend code')}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleUpdatePassword} className="space-y-6">
               <div>
                 <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">{t('New Password')}</label>
                 <div className="relative">
@@ -286,14 +317,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}
-              </button>
-              
-              <button 
-                type="button"
-                onClick={() => setStep('request')}
-                className="w-full text-sm text-gray-500 hover:text-indigo-600 transition-colors font-medium"
-              >
-                {t('Resend code')}
               </button>
             </form>
           )}

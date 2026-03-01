@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Eye, EyeOff } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 interface RegistrationProps {
@@ -13,6 +14,7 @@ interface RegistrationProps {
 const Registration: React.FC<RegistrationProps> = ({ onClose, onRegister, onSignIn, isDark }) => {
   const { t } = useTranslation();
   const [role, setRole] = useState<'creator' | 'investor'>('creator');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -218,13 +220,24 @@ const Registration: React.FC<RegistrationProps> = ({ onClose, onRegister, onSign
                     </svg>
                   </div>
                   <input 
-                    type="password" 
-                    className={inputStyles} 
+                    type={showPassword ? "text" : "password"} 
+                    className={`${inputStyles} pr-12`} 
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
                 </div>
               </div>
 

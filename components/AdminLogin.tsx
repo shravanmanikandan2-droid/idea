@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Shield, ArrowLeft, Lock, User } from 'lucide-react';
+import { Shield, ArrowLeft, Lock, User, Eye, EyeOff } from 'lucide-react';
 import Button from './Button';
 
 interface AdminLoginProps {
@@ -12,6 +12,7 @@ interface AdminLoginProps {
 const AdminLogin: React.FC<AdminLoginProps> = ({ onBack, onSuccess, isDark }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -91,10 +92,10 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onBack, onSuccess, isDark }) =>
             <div className="relative">
               <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full pl-12 pr-4 py-4 rounded-2xl border transition-all outline-none ${
+                className={`w-full pl-12 pr-12 py-4 rounded-2xl border transition-all outline-none ${
                   isDark 
                     ? 'bg-gray-800/50 border-gray-700 text-white focus:border-indigo-500' 
                     : 'bg-slate-50 border-slate-200 text-gray-900 focus:border-indigo-600'
@@ -102,6 +103,17 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onBack, onSuccess, isDark }) =>
                 placeholder="••••••••"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </div>
 

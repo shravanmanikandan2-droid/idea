@@ -14,7 +14,7 @@ import DarkCard from './DarkCard';
 
 const PowerfulFeaturesSection: React.FC = () => {
   return (
-    <section className="bg-white dark:bg-[#121B35] py-16 lg:py-24 transition-colors duration-300">
+    <section id="powerful-features" className="bg-white dark:bg-[#121B35] py-16 lg:py-24 transition-colors duration-300">
       <div className="container mx-auto px-4 text-center">
         <span className="inline-flex items-center px-3 py-1 mb-6 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 uppercase tracking-wide animate-fade-in-up">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>

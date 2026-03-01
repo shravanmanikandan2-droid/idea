@@ -76,6 +76,23 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const navigateToAbout = () => {
+    if (view !== 'landing') {
+      setView('landing');
+      setTimeout(() => {
+        const element = document.getElementById('powerful-features');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById('powerful-features');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   const navigateToPrivacy = () => {
     setView('privacy');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -165,6 +182,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -180,6 +198,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -195,6 +214,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -210,6 +230,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -225,6 +246,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -240,6 +262,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -278,6 +301,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -334,6 +358,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -353,6 +378,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -371,6 +397,7 @@ const App: React.FC = () => {
           onContact={navigateToContact}
           onCareers={navigateToCareers}
           onTerms={navigateToTerms}
+          onAbout={navigateToAbout}
         />
       </div>
     );
@@ -482,6 +509,7 @@ const App: React.FC = () => {
         onContact={navigateToContact}
         onCareers={navigateToCareers}
         onTerms={navigateToTerms}
+        onAbout={navigateToAbout}
       />
     </div>
   );
