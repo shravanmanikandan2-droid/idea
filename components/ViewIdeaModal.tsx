@@ -28,6 +28,7 @@ const ViewIdeaModal: React.FC<ViewIdeaModalProps> = ({ isOpen, idea, onClose, on
   });
 
   const [localVotes, setLocalVotes] = useState(0);
+  const [voteCounts, setVoteCounts] = useState({ yes: 0, maybe: 0, no: 0 });
   const [confidence, setConfidence] = useState(0);
   const [showContactInfo, setShowContactInfo] = useState(false);
   const [investStep, setInvestStep] = useState<'prompt' | 'info'>('prompt');
@@ -110,11 +111,14 @@ const ViewIdeaModal: React.FC<ViewIdeaModalProps> = ({ isOpen, idea, onClose, on
       if (data) {
         let yesCount = 0;
         let noCount = 0;
+        let maybeCount = 0;
         data.forEach(vote => {
           if (vote.yes_vote) yesCount++;
           if (vote.no_vote) noCount++;
+          if (vote.maybe_vote) maybeCount++;
         });
 
+        setVoteCounts({ yes: yesCount, maybe: maybeCount, no: noCount });
         const netVotes = yesCount - noCount;
         setConfidence(Math.round(Math.sign(netVotes) * Math.min(100, Math.sqrt(Math.abs(netVotes)) * 10)));
       }
@@ -180,6 +184,19 @@ const ViewIdeaModal: React.FC<ViewIdeaModalProps> = ({ isOpen, idea, onClose, on
         idea.votes = (idea.votes || 0) + 1;
         setLocalVotes(prev => prev + 1);
       }
+      
+      // Update local vote counts optimistically
+      setVoteCounts(prev => {
+        const newCounts = { ...prev };
+        if (userVote === 'yes') newCounts.yes--;
+        if (userVote === 'maybe') newCounts.maybe--;
+        if (userVote === 'no') newCounts.no--;
+        
+        if (type === 'yes') newCounts.yes++;
+        if (type === 'maybe') newCounts.maybe++;
+        if (type === 'no') newCounts.no++;
+        return newCounts;
+      });
       
       setUserVote(type);
     } catch (err) {
@@ -573,27 +590,36 @@ const ViewIdeaModal: React.FC<ViewIdeaModalProps> = ({ isOpen, idea, onClose, on
               <div className="bg-[#1e293b]/20 border border-gray-800/50 p-5 rounded-2xl">
                 <h4 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-4 text-center">{t('Would you use this?')}</h4>
                 <div className="flex gap-2">
-                  <button 
-                    onClick={() => handleVote('yes')}
-                    disabled={voting}
-                    className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all border ${userVote === 'yes' ? 'bg-green-500 border-green-400 text-white shadow-lg shadow-green-500/20' : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-green-400 hover:border-green-500/30'} ${voting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {t('Yes')}
-                  </button>
-                  <button 
-                    onClick={() => handleVote('maybe')}
-                    disabled={voting}
-                    className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all border ${userVote === 'maybe' ? 'bg-yellow-500 border-yellow-400 text-white shadow-lg shadow-yellow-500/20' : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-yellow-400 hover:border-yellow-500/30'} ${voting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {t('Maybe')}
-                  </button>
-                  <button 
-                    onClick={() => handleVote('no')}
-                    disabled={voting}
-                    className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all border ${userVote === 'no' ? 'bg-red-500 border-red-400 text-white shadow-lg shadow-red-500/20' : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-red-400 hover:border-red-500/30'} ${voting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {t('No')}
-                  </button>
+                  <div className="flex-1 flex flex-col items-center">
+                    <button 
+                      onClick={() => handleVote('yes')}
+                      disabled={voting}
+                      className={`w-full py-2 rounded-xl text-xs font-bold transition-all border ${userVote === 'yes' ? 'bg-green-500 border-green-400 text-white shadow-lg shadow-green-500/20' : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-green-400 hover:border-green-500/30'} ${voting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      {t('Yes')}
+                    </button>
+                    <span className="text-[10px] text-gray-500 mt-1 font-medium">{voteCounts.yes} votes</span>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center">
+                    <button 
+                      onClick={() => handleVote('maybe')}
+                      disabled={voting}
+                      className={`w-full py-2 rounded-xl text-xs font-bold transition-all border ${userVote === 'maybe' ? 'bg-yellow-500 border-yellow-400 text-white shadow-lg shadow-yellow-500/20' : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-yellow-400 hover:border-yellow-500/30'} ${voting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      {t('Maybe')}
+                    </button>
+                    <span className="text-[10px] text-gray-500 mt-1 font-medium">{voteCounts.maybe} votes</span>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center">
+                    <button 
+                      onClick={() => handleVote('no')}
+                      disabled={voting}
+                      className={`w-full py-2 rounded-xl text-xs font-bold transition-all border ${userVote === 'no' ? 'bg-red-500 border-red-400 text-white shadow-lg shadow-red-500/20' : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-red-400 hover:border-red-500/30'} ${voting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      {t('No')}
+                    </button>
+                    <span className="text-[10px] text-gray-500 mt-1 font-medium">{voteCounts.no} votes</span>
+                  </div>
                 </div>
               </div>
 

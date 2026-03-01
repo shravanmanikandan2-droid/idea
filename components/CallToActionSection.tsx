@@ -25,9 +25,6 @@ const CallToActionSection: React.FC<CallToActionSectionProps> = ({ onGetStarted 
             Get Started Free
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
           </Button>
-          <Button variant="darkOutline" size="lg" className="border-gray-300 text-gray-300 hover:bg-gray-300/20">
-            Watch Demo
-          </Button>
         </div>
         <p className="text-gray-400 text-sm mt-8 animate-fade-in-up delay-300">
           Free forever for basic validation. No credit card needed.

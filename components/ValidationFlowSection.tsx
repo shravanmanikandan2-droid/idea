@@ -34,24 +34,11 @@ const ValidationFlowSection: React.FC = () => {
                 <p className="text-gray-500 dark:text-gray-400">Is it too cheap, fair, or too expensive? Find the sweet spot.</p>
               </div>
             </li>
-            <li className="flex items-start">
-              <div className="text-indigo-600 dark:text-indigo-400 text-3xl mr-4 flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" /></svg>
-              </div>
-              <div>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white">Waitlist Capture</h4>
-                <p className="text-gray-500 dark:text-gray-400">Turn interest into leads with optional email sign-ups.</p>
-              </div>
-            </li>
           </ul>
         </div>
 
         {/* Right Column: Mockup */}
         <div className="relative p-4 sm:p-8 bg-white dark:bg-[#182137] rounded-lg shadow-lg dark:shadow-xl animate-fade-in-right border border-gray-100 dark:border-transparent">
-            <div className="absolute top-4 left-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-gray-300">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" /></svg>
-                AI-Powered Task Manager
-            </div>
             <p className="text-center text-gray-400 dark:text-gray-500 text-sm mt-12 mb-6">Smart scheduling that learns from your work patterns</p>
 
             <div className="text-center mb-8">

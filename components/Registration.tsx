@@ -24,7 +24,6 @@ const Registration: React.FC<RegistrationProps> = ({ onClose, onRegister, onSign
     interests: '',
     industry: '',
     contact_person: '',
-    investor_type: 'Angel',
     investment_range: '',
     sectors: '',
   });
@@ -75,7 +74,6 @@ const Registration: React.FC<RegistrationProps> = ({ onClose, onRegister, onSign
           profileData.company_name = formData.name;
           profileData.industry = formData.industry;
           profileData.contact_person = formData.contact_person;
-          profileData.investor_type = formData.investor_type;
           profileData.investment_range = formData.investment_range;
           profileData.sectors = formData.sectors.split(',').map(s => s.trim()).filter(s => s !== '');
         }
@@ -294,19 +292,6 @@ const Registration: React.FC<RegistrationProps> = ({ onClose, onRegister, onSign
                     value={formData.contact_person}
                     onChange={(e) => setFormData({...formData, contact_person: e.target.value})}
                   />
-                </div>
-                <div>
-                  <label className={labelStyles}>{t('Company Type')}</label>
-                  <select 
-                    className={inputStyles}
-                    value={formData.investor_type}
-                    onChange={(e) => setFormData({...formData, investor_type: e.target.value})}
-                  >
-                    <option value="Angel">Angel</option>
-                    <option value="VC">VC</option>
-                    <option value="Corporate">Corporate</option>
-                    <option value="Family Office">Family Office</option>
-                  </select>
                 </div>
                 <div>
                   <label className={labelStyles}>{t('Investment Range')}</label>
