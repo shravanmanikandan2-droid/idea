@@ -34,33 +34,27 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('request-reset', {
-        body: { email: email.trim() }
+      // Use direct fetch for better error visibility and control
+      const rawUrl = import.meta.env.VITE_SUPABASE_URL;
+      const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      const response = await fetch(`${rawUrl}/functions/v1/request-reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${rawKey}`,
+          'apikey': rawKey
+        },
+        body: JSON.stringify({ email: email.trim() })
       });
 
-      if (error) {
-        console.error('Invoke error:', error);
-        // Try to extract the error message from the response
-        let errorMessage = t('Failed to send reset code');
-        if (error.context && error.context.json) {
-          try {
-            const errData = await error.context.json();
-            if (errData.error === 'rate_limited') {
-              errorMessage = t('Too many requests. Please wait a minute before trying again.');
-            } else if (errData.error) {
-              errorMessage = errData.error;
-            }
-          } catch (e) {
-            // Ignore JSON parse errors
-          }
-        } else if (error.name === 'FunctionsFetchError') {
-          errorMessage = t('Could not connect to the server. Please check your internet connection or ensure the Edge Function is deployed.');
-        } else if (error.name === 'FunctionsRelayError') {
-          errorMessage = t('Edge Function not found or crashed. Please ensure it is deployed correctly.');
-        } else if (error.message && error.message !== 'Failed to fetch') {
-          errorMessage = error.message;
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.error === 'rate_limited') {
+          throw new Error(t('Too many requests. Please wait an hour before trying again.'));
         }
-        throw new Error(errorMessage);
+        throw new Error(data.error || data.details || t('Failed to send reset code'));
       }
 
       setStep('verify');
@@ -95,34 +89,29 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, isDark }) => {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('verify-reset', {
-        body: { 
+      const rawUrl = import.meta.env.VITE_SUPABASE_URL;
+      const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      const response = await fetch(`${rawUrl}/functions/v1/verify-reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${rawKey}`,
+          'apikey': rawKey
+        },
+        body: JSON.stringify({ 
           email: email.trim(),
           otp: otp.trim(),
           new_password: password
-        }
+        })
       });
 
-      if (error) {
-        console.error('Invoke error:', error);
-        let errorMessage = t('Failed to update password');
-        if (error.context && error.context.json) {
-          try {
-            const errData = await error.context.json();
-            if (errData.error === 'invalid_otp') errorMessage = t('Invalid verification code');
-            else if (errData.error === 'expired') errorMessage = t('Code has expired');
-            else if (errData.error) errorMessage = errData.error;
-          } catch (e) {
-            // Ignore JSON parse errors
-          }
-        } else if (error.name === 'FunctionsFetchError') {
-          errorMessage = t('Could not connect to the server. Please check your internet connection or ensure the Edge Function is deployed.');
-        } else if (error.name === 'FunctionsRelayError') {
-          errorMessage = t('Edge Function not found or crashed. Please ensure it is deployed correctly.');
-        } else if (error.message && error.message !== 'Failed to fetch') {
-          errorMessage = error.message;
-        }
-        throw new Error(errorMessage);
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.error === 'invalid_otp') throw new Error(t('Invalid verification code'));
+        if (data.error === 'expired') throw new Error(t('Code has expired'));
+        throw new Error(data.error || data.details || t('Failed to update password'));
       }
 
       setSuccess(true);
